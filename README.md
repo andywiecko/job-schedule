@@ -1,2 +1,2 @@
 # job-schedule
-schedule proceses on linux using gnu programs
+schedule proceses on linux using python2.7
