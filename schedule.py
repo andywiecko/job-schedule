@@ -3,6 +3,10 @@ import os
 import subprocess
 
 max_running_jobs = 4
+
+
+
+
 # list with running jobs
 running_jobs     = []
 # stack with jobs in queue
@@ -26,6 +30,7 @@ while (queue_jobs != []):
         print proc.pid,proc.poll()
 
         if proc.poll() == 0:
+            if queue_jobs == []: break
             running_jobs[i] = subprocess.Popen(queue_jobs.pop(), shell = True)
             done_jobs += 1
             print 'jobs done: ',done_jobs,'/', all_jobs
@@ -43,20 +48,3 @@ while (running_jobs != []):
             print 'jobs done: ',done_jobs,'/', all_jobs
 
     print ''
-
-
-
-
-
-#for i in job_file:
-#    print i
-#    running_jobs.append(subprocess.Popen(i, shell = True))
-#
-#for i in range(11):
-#    os.system('sleep 1')
-#    for i in running_jobs:
-#        print i.pid,i.poll()
-#    
-#    
-#print process.pid,process.poll()
-
