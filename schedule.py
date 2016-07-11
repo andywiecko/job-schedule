@@ -1,9 +1,10 @@
 #!/bin/python
 import os
 import subprocess
+import time
 
 max_running_jobs = 4
-
+sync_time = 3
 
 
 
@@ -24,27 +25,22 @@ for i in range(max_running_jobs):
 
 
 while (queue_jobs != []):
-    os.system('sleep 1')
+    time.sleep(sync_time)
     for i in range(max_running_jobs):
         proc = running_jobs[i]
-        print proc.pid,proc.poll()
-
+        
         if proc.poll() == 0:
             if queue_jobs == []: break
             running_jobs[i] = subprocess.Popen(queue_jobs.pop(), shell = True)
             done_jobs += 1
-            print 'jobs done: ',done_jobs,'/', all_jobs
-
-    print ''
+            print 'jobs done: ',done_jobs,'/', all_jobs,' (workers: ',len(running_jobs),')'
 
 while (running_jobs != []):
-    os.system('sleep 1')
+    time.sleep(sync_time)
     for proc in running_jobs:
-        print proc.pid,proc.poll()
 
         if proc.poll() == 0:
             running_jobs.remove(proc)
             done_jobs += 1
-            print 'jobs done: ',done_jobs,'/', all_jobs
+            print 'jobs done: ',done_jobs,'/', all_jobs,' (workers: ',len(running_jobs),')'
 
-    print ''
