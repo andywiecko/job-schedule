@@ -6,6 +6,7 @@ __version__ = "1.0"
 import os
 import subprocess
 import time
+import sys
 # ======================================================================
 # ==================== PARAMETERS DEFINE BY USER =======================
 # ======================================================================
@@ -15,6 +16,22 @@ max_running_jobs = 8
 sync_time = 0.1
 # file name with jobs
 filename = 'jobs.txt'
+# seting parameters via argv
+# example:
+"""
+python schedule.py jobs.txt        # job will be load from jobs.txt ...
+python schedule.py jobs.txt 3      # ...with 3 workers
+python schedule.py jobs.txt 3 0.1  # ...with sync time 0.1 sec
+"""
+if len(sys.argv)==2: 
+    filename         = sys.argv[1]
+if len(sys.argv)==3: 
+    filename         = sys.argv[1]
+    max_running_jobs = int(sys.argv[2])
+if len(sys.argv)==4:
+    filename         = sys.argv[1]
+    max_running_jobs = int(sys.argv[2])
+    sync_time        = float(sys.argv[3])
 # ======================================================================
 # ======================== PROGRAM CONSTANTS ===========================
 # ======================================================================
