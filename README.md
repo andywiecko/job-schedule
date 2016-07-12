@@ -22,4 +22,3 @@ To run jobs from a file with set number of workers and sync time:
 python schedule.py jobs.txt 3 0.5
 ~~~
 
-$$\hat H = \sum_i$$
