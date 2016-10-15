@@ -48,7 +48,7 @@ done_jobs = 0
 # ======================================================================
 # ===================== INITIALIZATION WORKERS =========================
 # ======================================================================
-for i in range(max_running_jobs):
+for i in range(all_jobs if max_running_jobs > all_jobs else max_running_jobs):
     running_jobs.append(subprocess.Popen(queue_jobs.pop(), shell = True))
 # ======================================================================
 # ===================== POPING JOBS FROM QUEUE =========================
