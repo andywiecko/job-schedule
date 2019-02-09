@@ -61,6 +61,7 @@ for i in range(all_jobs if max_running_jobs > all_jobs else max_running_jobs):
 # ===================== POPING JOBS FROM QUEUE =========================
 # ======================================================================
 
+print
 tmp_max_running_jobs = max_running_jobs
 TIME = time.time()
 doneOnTime = 0
@@ -97,17 +98,14 @@ while (queue_jobs != []):
                     running_jobs[i] = subprocess.Popen(queue_jobs.pop(), shell = True)
                     done_jobs += 1
                     doneOnTime += 1
-                    CURSOR_UP_ONE = "\x1b[1A"
                     BACK_TO_PREVLINE = "\033[F"
                     CLEAR_LINE = "\033[K"
-                    ERASE_LINE = "\x1b[2K"     
                     print BACK_TO_PREVLINE,CLEAR_LINE,
                     print BACK_TO_PREVLINE,CLEAR_LINE,
                     print '\rjobs done: ',done_jobs,'/', all_jobs,' (workers: ',len(running_jobs),')'
                     deltaTIME = (time.time() - TIME) / doneOnTime
                     deltaTIME = deltaTIME*(all_jobs-done_jobs)
-                    print datetime.fromtimestamp(time.time()+deltaTIME).strftime("%A, %B %d, %Y %H:%M:%S")
-                    #print '\x1b[1A',
+                    print 'Estimated time:',datetime.fromtimestamp(time.time()+deltaTIME).strftime("%A, %B %d, %Y %H:%M:%S")
                     sys.stdout.flush()
 # ======================================================================
 # ====================== REMAINING LAST JOBS ===========================
