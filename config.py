@@ -1,1 +1,1 @@
-max_running_jobs = 1
+max_running_jobs = 4
