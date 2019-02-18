@@ -40,6 +40,7 @@ popen.LoadJobs(filename)
 popen.all_jobs = len(popen.queue_jobs)
 # jobs done counter
 popen.done_jobs = 0
+popen.SetErrorFile()
 popen.importSettings('.config.py')
 popen.reloadLib()
 #import config
@@ -51,6 +52,7 @@ tmp_max_running_jobs = popen.max_running_jobs
 popen.SetGlobalTime()
 popen.ResetTime()
 popen.PrintDone()
+
 
 while (popen.queue_jobs != [] or popen.running_jobs != []):
      time.sleep(sync_time)
@@ -74,7 +76,11 @@ while (popen.queue_jobs != [] or popen.running_jobs != []):
      #for i in range(popen.max_running_jobs):
      for i in range(len(popen.running_jobs)):
           proc = popen.running_jobs[i]
-          if proc.poll() != None:
+          returnCode = proc.poll()
+          if returnCode != None:
+
+               if returnCode != 0:
+                    popen.numErrors += 1
 
                if popen.queue_jobs == []: 
                     popen.running_jobs.remove(proc)
