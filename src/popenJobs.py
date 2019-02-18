@@ -3,11 +3,12 @@ from datetime import datetime
 import sys
 import time
 import subprocess
+import imp
 # ======================================================================
 # ======================== PROGRAM CONSTANTS ===========================
 # ======================================================================
 # max number of jobs running at once
-max_running_jobs = 8
+max_running_jobs = 1
 # list with running jobs
 running_jobs     = []
 # stack with jobs in queue
@@ -16,6 +17,7 @@ all_jobs = 0
 
 done_jobs = 0
 
+GLOBALTIME = 0
 TIME = 0
 doneOnTime = 0
 
@@ -27,6 +29,10 @@ def InitWorkers():
     global running_jobs,queue_jobs
     for i in range(all_jobs if max_running_jobs > all_jobs else max_running_jobs):
         running_jobs.append(subprocess.Popen(queue_jobs.pop(), shell = True))
+
+def SetGlobalTime():
+     global GLOBALTIME
+     GLOBALTIME = time.time()
 
 def ResetTime():
      global TIME,doneOnTime
@@ -40,11 +46,20 @@ def PrintDone():
      print BACK_TO_PREVLINE,CLEAR_LINE,
      
      print '\rjobs done: ',done_jobs,'/', all_jobs,' (workers: ',len(running_jobs),')'
-     if doneOnTime != 0:
+     if done_jobs == all_jobs: 
+         GLTIME = time.time() - GLOBALTIME
+         sys.stdout.write("\033[K")
+         days    = divmod(GLTIME, 86400)        # Get days (without [0]!)
+         hours   = divmod(days[1], 3600)               # Use remainder of days to calc hours
+         minutes = divmod(hours[1], 60)                # Use remainder of hours to calc minutes
+         seconds = divmod(minutes[1], 1)               # Use remainder of minutes to calc seconds
+         print 'Total computation time: %d days, %d hours, %d minutes and %d seconds' % (days[0], hours[0], minutes[0], seconds[0])
+
+     if doneOnTime != 0 and done_jobs != all_jobs:
          deltaTIME = (time.time() - TIME) / doneOnTime
          deltaTIME = deltaTIME*(all_jobs-done_jobs)
          print 'Estimated time:',datetime.fromtimestamp(time.time()+deltaTIME).strftime("%A, %B %d, %Y %H:%M:%S"),
-     else: print 'Estimating time ...',
+     if done_jobs ==0: print 'Estimating time ...',
      sys.stdout.flush()
 
 def PopJobFromQueue(i):
@@ -65,3 +80,15 @@ def AppendWorkersToJobs(howMany):
     for j in range(howMany):
          running_jobs.append(subprocess.Popen(queue_jobs.pop(), shell = True))
 
+config = ''
+def importSettings(settingsFileName):
+    global config
+    config = imp.load_source('config', '.config.py')
+
+def reloadLib():
+    global config
+    config = imp.load_source('config', '.config.py')
+
+    # TODO
+    # reload doesnt work, dont know why
+    #reload(config)

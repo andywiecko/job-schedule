@@ -40,33 +40,47 @@ popen.LoadJobs(filename)
 popen.all_jobs = len(popen.queue_jobs)
 # jobs done counter
 popen.done_jobs = 0
-import config
+popen.importSettings('.config.py')
+popen.reloadLib()
+#import config
 # ===================== INITIALIZATION WORKERS =========================
 popen.InitWorkers()
 # ===================== POPING JOBS FROM QUEUE =========================
 print
 tmp_max_running_jobs = popen.max_running_jobs
+popen.SetGlobalTime()
 popen.ResetTime()
 popen.PrintDone()
-while (popen.queue_jobs != []):
+
+while (popen.queue_jobs != [] or popen.running_jobs != []):
      time.sleep(sync_time)
 
      try:
-          reload(config)
+          popen.reloadLib()
           error = ""
      except:
           error = "Syntax ERROR: there is an error in config.py file\n" 
-     tmp_max_running_jobs = config.max_running_jobs
+     tmp_max_running_jobs = popen.config.max_running_jobs
+
+     # add missing workers
      if tmp_max_running_jobs > popen.max_running_jobs:
           popen.ResetTime()
           diff = tmp_max_running_jobs - popen.max_running_jobs
+          if diff > len(popen.queue_jobs): diff = len(popen.queue_jobs)
           popen.AppendWorkersToJobs(diff)
           popen.max_running_jobs = tmp_max_running_jobs
+          popen.PrintDone()
 
-     for i in range(popen.max_running_jobs):
+     #for i in range(popen.max_running_jobs):
+     for i in range(len(popen.running_jobs)):
           proc = popen.running_jobs[i]
           if proc.poll() != None:
-               if popen.queue_jobs == []: break
+
+               if popen.queue_jobs == []: 
+                    popen.running_jobs.remove(proc)
+                    popen.doneOnTime += 1
+                    popen.done_jobs += 1
+                    break
 
                if tmp_max_running_jobs < popen.max_running_jobs:
                     popen.PopWorkerFromJobs(proc)                    
@@ -74,11 +88,6 @@ while (popen.queue_jobs != []):
                else:
                     popen.PopJobFromQueue(i)
 
-# ====================== REMAINING LAST JOBS ===========================
-while (popen.running_jobs != []):
-    time.sleep(sync_time)
-    for proc in popen.running_jobs:
-        if proc.poll() != None:
-            popen.running_jobs.remove(proc)
-            popen.done_jobs += 1
-            print 'jobs done: ',popen.done_jobs,'/', popen.all_jobs,' (workers: ',len(popen.running_jobs),')'
+
+
+popen.PrintDone()
