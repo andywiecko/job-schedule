@@ -4,15 +4,14 @@ __author__ = "andywiecko"
 __version__ = "1.2"
 # TODO
 # - make some clean up
-# - ... some defs
-# - ... queue the jobs
-# - hide remaining jobs in one function
-# - handle errors
+# + ... some defs
+# + ... queue the jobs
+# + hide remaining jobs in one function
+# + handle errors
 # - config with '.' in a name and autogenerating config with PID
 # ======================================================================
 import src.popenJobs as popen
 from src.libs import *
-#sys.stdout = open("file.txt", "rw+")
 # sync time in seconds
 sync_time = 0.1
 # file name with jobs
@@ -20,19 +19,14 @@ filename = 'jobs.txt'
 # example:
 """
 python schedule.py jobs.txt        # job will be load from jobs.txt ...
-python schedule.py jobs.txt 3      # ...with 3 workers
-python schedule.py jobs.txt 3 0.1  # ...with sync time 0.1 sec
+python schedule.py jobs.txt 0.1  # ...with sync time 0.1 sec
 """
 # seting parameters via argv
 if len(sys.argv)==2: 
     filename         = sys.argv[1]
 if len(sys.argv)==3: 
     filename         = sys.argv[1]
-    popen.max_running_jobs = int(sys.argv[2])
-if len(sys.argv)==4:
-    filename         = sys.argv[1]
-    popen.max_running_jobs = int(sys.argv[2])
-    sync_time        = float(sys.argv[3])
+    sync_time        = float(sys.argv[2])
 
 # load file with jobs
 popen.LoadJobs(filename)
@@ -43,7 +37,6 @@ popen.done_jobs = 0
 popen.SetErrorFile()
 popen.importSettings('.config.py')
 popen.reloadLib()
-#import config
 # ===================== INITIALIZATION WORKERS =========================
 popen.InitWorkers()
 # ===================== POPING JOBS FROM QUEUE =========================
@@ -52,7 +45,6 @@ tmp_max_running_jobs = popen.max_running_jobs
 popen.SetGlobalTime()
 popen.ResetTime()
 popen.PrintDone()
-
 
 while (popen.queue_jobs != [] or popen.running_jobs != []):
      time.sleep(sync_time)

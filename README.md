@@ -9,16 +9,14 @@ To run jobs from a file with default number of workers:
 python schedule.py jobs.txt       
 ~~~
 
-To run jobs from a file with set number of workers:
+To run jobs from a file with set sync time [ms]:
 
 ~~~
-python schedule.py jobs.txt 3   
+python schedule.py jobs.txt 0.5
 ~~~
 
+To change number of workers just edit `.config.py` file.
 
-To run jobs from a file with set number of workers and sync time:
+Current status and occured errors one see in `.status` and `.errors` files respectively.
 
-~~~
-python schedule.py jobs.txt 3 0.5
-~~~
 
