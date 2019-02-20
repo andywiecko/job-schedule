@@ -61,7 +61,7 @@ while (popen.queue_jobs != [] or popen.running_jobs != []):
           popen.reloadLib()
           error = ""
      except:
-          error = "Syntax ERROR: there is an error in config.py file\n" 
+          error = "Syntax ERROR: there is an error in config.py file\n"
      tmp_max_running_jobs = popen.config.max_running_jobs
 
      # add missing workers
@@ -73,7 +73,6 @@ while (popen.queue_jobs != [] or popen.running_jobs != []):
           popen.max_running_jobs = tmp_max_running_jobs
           popen.PrintDone()
 
-     #for i in range(popen.max_running_jobs):
      for i in range(len(popen.running_jobs)):
           proc = popen.running_jobs[i]
           returnCode = proc.poll()
@@ -93,7 +92,5 @@ while (popen.queue_jobs != [] or popen.running_jobs != []):
                     break
                else:
                     popen.PopJobFromQueue(i)
-
-
 
 popen.PrintDone()

@@ -1,20 +1,10 @@
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
-sleep 3
+sleep 1; echo 0 >> loginka
+sleep 1; echo 0 >> loginka
+sleep 1; echo 0 >> loginka
+sleep 1; echo 0 >> loginka
+sleep 1; echo 1 >> loginka
+sleep 1; echo 2 >> loginka
+sleep 10; echo 3 >> loginka
+sleep 10; echo 4 >> loginka
+sleep 10; echo 5 >> loginka
+sleep 10; echo 6 > loginka
