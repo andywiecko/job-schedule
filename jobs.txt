@@ -1,6 +1,10 @@
-./test 18 0 1.0 R1 > logs/majorana/OBC/ground_state/R1/delta10F10e ; sleep 1&
-./test 18 0 1.5 R1 > logs/majorana/OBC/ground_state/R1/delta10F15e ; sleep 1&
-./test 18 0 3.0 R1 > logs/majorana/OBC/ground_state/R1/delta10F30e ; sleep 1&
-./test 18 0 5.0 R1 > logs/majorana/OBC/ground_state/R1/delta10F50e ; sleep 1&
-./test 18 0 8.0 R1 > logs/majorana/OBC/ground_state/R1/delta10F80e ; sleep 1&
-./test 18 0 0.5 R1 > logs/majorana/OBC/ground_state/R1/delta10F05e ; sleep 1&
+sleep 1; echo 0 >> loginka
+sleep 1; echo 0 >> loginka
+sleep 1; echo 0 >> loginka
+sleep 1; echo 0 >> loginka
+sleep 1; echo 1 >> loginka
+sleep 1; echo 2 >> loginka
+sleep 10; echo 3 >> loginka
+sleep 10; echo 4 >> loginka
+sleep 10; echo 5 >> loginka
+sleep 10; echo 6 > loginka

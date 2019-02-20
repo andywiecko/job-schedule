@@ -1,77 +1,96 @@
 #!/bin/python
 # ======================================================================
 __author__ = "andywiecko"
-__version__ = "1.0"
+__version__ = "1.2"
+# TODO
+# - make some clean up
+# - ... some defs
+# - ... queue the jobs
+# - hide remaining jobs in one function
+# - handle errors
+# - config with '.' in a name and autogenerating config with PID
 # ======================================================================
-import os
-import subprocess
-import time
-import sys
-# ======================================================================
-# ==================== PARAMETERS DEFINE BY USER =======================
-# ======================================================================
-# max number of jobs running at once
-max_running_jobs = 8
+import src.popenJobs as popen
+from src.libs import *
+#sys.stdout = open("file.txt", "rw+")
 # sync time in seconds
 sync_time = 0.1
 # file name with jobs
 filename = 'jobs.txt'
-# seting parameters via argv
 # example:
 """
 python schedule.py jobs.txt        # job will be load from jobs.txt ...
 python schedule.py jobs.txt 3      # ...with 3 workers
 python schedule.py jobs.txt 3 0.1  # ...with sync time 0.1 sec
 """
+# seting parameters via argv
 if len(sys.argv)==2: 
     filename         = sys.argv[1]
 if len(sys.argv)==3: 
     filename         = sys.argv[1]
-    max_running_jobs = int(sys.argv[2])
+    popen.max_running_jobs = int(sys.argv[2])
 if len(sys.argv)==4:
     filename         = sys.argv[1]
-    max_running_jobs = int(sys.argv[2])
+    popen.max_running_jobs = int(sys.argv[2])
     sync_time        = float(sys.argv[3])
-# ======================================================================
-# ======================== PROGRAM CONSTANTS ===========================
-# ======================================================================
-# list with running jobs
-running_jobs     = []
-# stack with jobs in queue
-queue_jobs       = []
-# load file with jobs
-queue_jobs = open(filename,'r').read().split('\n')[:-1]
-# number of all jobs in queue
-all_jobs = len(queue_jobs)
-# jobs done counter
-done_jobs = 0
-# ======================================================================
-# ===================== INITIALIZATION WORKERS =========================
-# ======================================================================
-for i in range(all_jobs if max_running_jobs > all_jobs else max_running_jobs):
-    running_jobs.append(subprocess.Popen(queue_jobs.pop(), shell = True))
-# ======================================================================
-# ===================== POPING JOBS FROM QUEUE =========================
-# ======================================================================
-while (queue_jobs != []):
-    time.sleep(sync_time)
-    for i in range(max_running_jobs):
-        proc = running_jobs[i]
-        
-        if proc.poll() == 0:
-            if queue_jobs == []: break
-            running_jobs[i] = subprocess.Popen(queue_jobs.pop(), shell = True)
-            done_jobs += 1
-            print 'jobs done: ',done_jobs,'/', all_jobs,' (workers: ',len(running_jobs),')'
-# ======================================================================
-# ====================== REMAINING LAST JOBS ===========================
-# ======================================================================
-while (running_jobs != []):
-    time.sleep(sync_time)
-    for proc in running_jobs:
 
-        if proc.poll() == 0:
-            running_jobs.remove(proc)
-            done_jobs += 1
-            print 'jobs done: ',done_jobs,'/', all_jobs,' (workers: ',len(running_jobs),')'
-# ======================================================================
+# load file with jobs
+popen.LoadJobs(filename)
+# number of all jobs in queue
+popen.all_jobs = len(popen.queue_jobs)
+# jobs done counter
+popen.done_jobs = 0
+popen.SetErrorFile()
+popen.importSettings('.config.py')
+popen.reloadLib()
+#import config
+# ===================== INITIALIZATION WORKERS =========================
+popen.InitWorkers()
+# ===================== POPING JOBS FROM QUEUE =========================
+print
+tmp_max_running_jobs = popen.max_running_jobs
+popen.SetGlobalTime()
+popen.ResetTime()
+popen.PrintDone()
+
+
+while (popen.queue_jobs != [] or popen.running_jobs != []):
+     time.sleep(sync_time)
+
+     try:
+          popen.reloadLib()
+          error = ""
+     except:
+          error = "Syntax ERROR: there is an error in config.py file\n"
+     tmp_max_running_jobs = popen.config.max_running_jobs
+
+     # add missing workers
+     if tmp_max_running_jobs > popen.max_running_jobs:
+          popen.ResetTime()
+          diff = tmp_max_running_jobs - popen.max_running_jobs
+          if diff > len(popen.queue_jobs): diff = len(popen.queue_jobs)
+          popen.AppendWorkersToJobs(diff)
+          popen.max_running_jobs = tmp_max_running_jobs
+          popen.PrintDone()
+
+     for i in range(len(popen.running_jobs)):
+          proc = popen.running_jobs[i]
+          returnCode = proc.poll()
+          if returnCode != None:
+
+               if returnCode != 0:
+                    popen.numErrors += 1
+
+               if popen.queue_jobs == []: 
+                    popen.running_jobs.remove(proc)
+                    popen.doneOnTime += 1
+                    popen.done_jobs += 1
+                    break
+
+               if tmp_max_running_jobs < popen.max_running_jobs:
+                    popen.PopWorkerFromJobs(proc)                    
+                    break
+               else:
+                    popen.PopJobFromQueue(i)
+
+popen.PrintDone()
